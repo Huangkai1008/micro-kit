@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Code Refactoring
+- options pattern
+
 
 <a name="v0.5.0"></a>
 ## [v0.5.0] - 2020-09-26

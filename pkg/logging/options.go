@@ -1,21 +1,29 @@
 package logging
 
-import "github.com/spf13/viper"
+type Option func(*Options)
 
 type Options struct {
-	Level    int
+	// FileName is log file name.
+	// It is required.
 	FileName string
-	Stdout   bool
+
+	// Level is log level.
+	Level int
+
+	// Stdout is whether enable stdout.
+	Stdout bool
 }
 
-// NewOptions returns new log options.
-func NewOptions(v *viper.Viper) (*Options, error) {
-	var (
-		err error
-		o   = new(Options)
-	)
-	if err = v.UnmarshalKey("log", o); err != nil {
-		return nil, err
+// WithLevel sets the log level.
+func WithLevel(level int) Option {
+	return func(o *Options) {
+		o.Level = level
 	}
-	return o, err
+}
+
+// WithStdout sets the flag to enable stdout.
+func WithStdout(stdout bool) Option {
+	return func(o *Options) {
+		o.Stdout = stdout
+	}
 }

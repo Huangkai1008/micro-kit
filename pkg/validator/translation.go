@@ -9,9 +9,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
-	"github.com/pkg/errors"
-
-	"github.com/Huangkai1008/micro-kit/pkg/message"
 )
 
 func registerTranslation(v *validator.Validate, locale string) (trans ut.Translator, err error) {
@@ -20,7 +17,7 @@ func registerTranslation(v *validator.Validate, locale string) (trans ut.Transla
 	trans, ok := uniTrans.GetTranslator(locale)
 	if !ok {
 		err = fmt.Errorf("uniTrans.GetTranslator(%s) failed", locale)
-		return nil, errors.Wrap(err, message.TransGetTranslatorError)
+		return nil, err
 	}
 	switch locale {
 	case "en":

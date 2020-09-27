@@ -7,11 +7,9 @@ import (
 	"syscall"
 
 	"github.com/minio/minio-go/v7"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"github.com/Huangkai1008/micro-kit/pkg/message"
 	"github.com/Huangkai1008/micro-kit/pkg/transport/http"
 )
 
@@ -28,11 +26,8 @@ type Application struct {
 	cancel     context.CancelFunc
 }
 
-// Option is the option of application.
-type Option func(app *Application) error
-
 // New returns a new Application.
-func New(name, version string, logger *zap.Logger, options ...Option) (*Application, error) {
+func New(name, version string, logger *zap.Logger, opts ...Option) (*Application, error) {
 
 	a := &Application{
 		Name:    name,
@@ -40,8 +35,8 @@ func New(name, version string, logger *zap.Logger, options ...Option) (*Applicat
 		logger:  logger.With(zap.String("type", "Application")),
 	}
 
-	for _, option := range options {
-		if err := option(a); err != nil {
+	for _, opt := range opts {
+		if err := opt(a); err != nil {
 			return nil, err
 		}
 	}
@@ -49,36 +44,10 @@ func New(name, version string, logger *zap.Logger, options ...Option) (*Applicat
 	return a, nil
 }
 
-// WithHttpServer sets the http server.
-func WithHttpServer(s *http.Server) Option {
-	return func(a *Application) error {
-		s.Name = a.Name
-		s.Version = a.Version
-		a.httpServer = s
-		return nil
-	}
-}
-
-// WithGrpcServer sets the grpc server.
-func WithGrpcServer(s *grpc.Server) Option {
-	return func(a *Application) error {
-		a.grpcServer = s
-		return nil
-	}
-}
-
-// WithMinioCli sets the minio client.
-func WithMinioCli(c *minio.Client) Option {
-	return func(a *Application) error {
-		a.minioCli = c
-		return nil
-	}
-}
-
 // Start Application.
 func (a *Application) Start() error {
 	if err := a.httpServer.Start(); err != nil {
-		return errors.WithMessage(err, message.HTTPServerStartError)
+		return err
 	}
 	a.logger.Info("Application Started", zap.String("name", a.Name))
 	return nil
@@ -87,7 +56,7 @@ func (a *Application) Start() error {
 // Stop Application.
 func (a *Application) Stop() error {
 	if err := a.httpServer.Stop(); err != nil {
-		return errors.WithMessage(err, message.HTTPServerStopError)
+		return err
 	}
 	a.logger.Info("Server exiting ...")
 	return nil

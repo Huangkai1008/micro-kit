@@ -1,39 +1,45 @@
 package gorm
 
-import (
-	"fmt"
-
-	"github.com/spf13/viper"
-)
+type Option func(*Options)
 
 type Options struct {
-	User       string
-	Password   string
-	Host       string
-	Port       int
-	DBName     string
-	Parameters string
+	// Source is the database connection string.
+	Source string
 
+	// MaxIdleConns is the maximum number of connections in the idle connection pool.
 	MaxIdleConnections int
+
+	// MaxOpenConns is the maximum number of open connections to the database.
 	MaxOpenConnections int
-	EnableAutoMigrate  bool
+
+	// EnableAutoMigrate is the flag to enable auto migrate.
+	EnableAutoMigrate bool
 }
 
-// NewOptions returns new log options.
-func NewOptions(v *viper.Viper) (*Options, error) {
-	var (
-		err error
-		o   = new(Options)
-	)
-	if err = v.UnmarshalKey("database", o); err != nil {
-		return nil, err
+// WithSource sets the database connection string.
+func WithSource(source string) Option {
+	return func(o *Options) {
+		o.Source = source
 	}
-
-	return o, err
 }
 
-// DSN returns data source name.
-func (o *Options) DSN() string {
-	const dsn = "%s:%s@tcp(%s:%d)/%s?%s"
-	return fmt.Sprintf(dsn, o.User, o.Password, o.Host, o.Port, o.DBName, o.Parameters)
+// WithMaxIdleConns sets the maximum number of connections in the idle connection pool.
+func WithMaxIdleConns(maxIdleConns int) Option {
+	return func(o *Options) {
+		o.MaxIdleConnections = maxIdleConns
+	}
+}
+
+// WithMaxOpenConns sets the maximum number of open connections to the database.
+func WithMaxOpenConns(maxOpenConns int) Option {
+	return func(o *Options) {
+		o.MaxOpenConnections = maxOpenConns
+	}
+}
+
+// WithEnableAutoMigrate sets the flag to enable auto migrate.
+func WithEnableAutoMigrate(enableAutoMigrate bool) Option {
+	return func(o *Options) {
+		o.EnableAutoMigrate = enableAutoMigrate
+	}
 }

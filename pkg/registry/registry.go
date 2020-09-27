@@ -2,6 +2,7 @@ package registry
 
 import "context"
 
+// Registrar is service registrar.
 type Registrar interface {
 	// Register a service with the registry.
 	Register(ctx context.Context, service *ServiceInstance) error

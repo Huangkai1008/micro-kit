@@ -7,16 +7,18 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/wire"
-	"github.com/labstack/echo/v4"
-
 	"github.com/pkg/errors"
 
 	"go.uber.org/zap"
 
-	kitutil "github.com/Huangkai1008/kit/pkg/util"
-
 	"github.com/Huangkai1008/micro-kit/pkg/registry"
+	"github.com/Huangkai1008/micro-kit/pkg/util"
+)
+
+var (
+	DefaultReadTimeout  = 60 * time.Second
+	DefaultWriteTimeout = 60 * time.Second
+	DefaultMode         = DebugMode
 )
 
 // Server is the HTTP server.
@@ -24,7 +26,7 @@ type Server struct {
 	Name       string
 	Version    string
 	httpServer *http.Server
-	router     *echo.Echo
+	router     http.Handler
 	logger     *zap.Logger
 	registrar  registry.Registrar
 
@@ -32,7 +34,23 @@ type Server struct {
 }
 
 // New creates a new HTTP server.
-func New(o *Options, logger *zap.Logger, router *echo.Echo, registrar registry.Registrar) *Server {
+//
+// The default options are:
+//  - ReadTimeout: DefaultReadTimeout
+//  - WriteTimeout: DefaultWriteTimeout
+//  - Mode: DebugMode
+//
+func New(logger *zap.Logger, router http.Handler, registrar registry.Registrar, opts ...Option) *Server {
+	o := Options{
+		ReadTimeout:  DefaultReadTimeout,
+		WriteTimeout: DefaultWriteTimeout,
+		Mode:         DefaultMode,
+	}
+
+	for _, opt := range opts {
+		opt(&o)
+	}
+
 	return &Server{
 		httpServer: &http.Server{
 			Addr:           o.Addr(),
@@ -43,7 +61,7 @@ func New(o *Options, logger *zap.Logger, router *echo.Echo, registrar registry.R
 		router:    router,
 		logger:    logger.With(zap.String("type", "http.Server")),
 		registrar: registrar,
-		Options:   o,
+		Options:   &o,
 	}
 }
 
@@ -103,7 +121,7 @@ func (s *Server) Service() *registry.ServiceInstance {
 }
 
 func (s *Server) IntranetAddr() string {
-	return fmt.Sprintf("%s:%d", kitutil.GetIntranetIP(), s.Port)
+	return fmt.Sprintf("%s:%d", util.GetIntranetIP(), s.Port)
 }
 
 func (s *Server) register(registry registry.Registrar) error {
@@ -113,5 +131,3 @@ func (s *Server) register(registry registry.Registrar) error {
 func (s *Server) deregister(registry registry.Registrar) error {
 	return registry.Deregister(context.Background(), s.Service())
 }
-
-var ProviderSet = wire.NewSet(New, NewOptions, NewRouter)

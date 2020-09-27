@@ -3,11 +3,6 @@ package http
 import (
 	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
-	"github.com/spf13/viper"
-
-	kitmsg "github.com/Huangkai1008/kit/pkg/message"
 )
 
 const (
@@ -15,6 +10,8 @@ const (
 	TestMode    = "testing"
 	ReleaseMode = "release"
 )
+
+type Option func(*Options)
 
 // Options for the HTTP server.
 type Options struct {
@@ -34,21 +31,43 @@ type Options struct {
 	Mode string
 }
 
-// NewOptions creates a new set of o for the HTTP server.
-func NewOptions(v *viper.Viper) (*Options, error) {
-	var (
-		err error
-		o   = new(Options)
-	)
-
-	if err = v.UnmarshalKey("http", o); err != nil {
-		return nil, errors.Wrap(err, kitmsg.LoadConfigError)
-	}
-	return o, err
-}
-
 // Addr returns the address of the HTTP server.
 // The format is "host:port".
 func (o *Options) Addr() string {
 	return fmt.Sprintf("%s:%d", o.Host, o.Port)
+}
+
+// WithHost sets the hostname of the HTTP server.
+func WithHost(host string) Option {
+	return func(o *Options) {
+		o.Host = host
+	}
+}
+
+// WithPort sets the port of the HTTP server.
+func WithPort(port int) Option {
+	return func(o *Options) {
+		o.Port = port
+	}
+}
+
+// WithReadTimeout sets the read-timeout for the HTTP server.
+func WithReadTimeout(readTimeout time.Duration) Option {
+	return func(o *Options) {
+		o.ReadTimeout = readTimeout
+	}
+}
+
+// WithWriteTimeout sets the write-timeout for the HTTP server.
+func WithWriteTimeout(writeTimeout time.Duration) Option {
+	return func(o *Options) {
+		o.WriteTimeout = writeTimeout
+	}
+}
+
+// WithMode sets the mode for the HTTP server.
+func WithMode(mode string) Option {
+	return func(o *Options) {
+		o.Mode = mode
+	}
 }

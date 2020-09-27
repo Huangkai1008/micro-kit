@@ -1,11 +1,6 @@
 package minio
 
-import (
-	"github.com/pkg/errors"
-	"github.com/spf13/viper"
-
-	"github.com/Huangkai1008/kit/pkg/message"
-)
+type Option func(*Options)
 
 // Options for MinIO storage.
 type Options struct {
@@ -25,15 +20,37 @@ type Options struct {
 	Region string
 }
 
-// NewOptions creates a new set of o for the minio client.
-func NewOptions(v *viper.Viper) (*Options, error) {
-	var (
-		err error
-		o   = new(Options)
-	)
-
-	if err = v.UnmarshalKey("minio", o); err != nil {
-		return nil, errors.Wrap(err, message.LoadConfigError)
+// WithEndpoint sets the endpoint of the MinIO storage.
+func WithEndpoint(endpoint string) Option {
+	return func(o *Options) {
+		o.Endpoint = endpoint
 	}
-	return o, err
+}
+
+// WithAccessKeyID sets the access key ID of the MinIO storage.
+func WithAccessKeyID(accessKeyID string) Option {
+	return func(o *Options) {
+		o.AccessKeyID = accessKeyID
+	}
+}
+
+// WithSecretAccessKey sets the secret access key of the MinIO storage.
+func WithSecretAccessKey(secretAccessKey string) Option {
+	return func(o *Options) {
+		o.SecretAccessKey = secretAccessKey
+	}
+}
+
+// WithUseSSL specifies whether to use SSL when accessing the MinIO storage.
+func WithUseSSL(useSSL bool) Option {
+	return func(o *Options) {
+		o.UseSSL = useSSL
+	}
+}
+
+// WithRegion specifies whether to use proxy when accessing the MinIO storage.
+func WithRegion(region string) Option {
+	return func(o *Options) {
+		o.Region = region
+	}
 }

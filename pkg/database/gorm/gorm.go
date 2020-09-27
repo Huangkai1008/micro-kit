@@ -1,33 +1,50 @@
 package gorm
 
 import (
-	"github.com/google/wire"
-	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
+)
 
-	"github.com/Huangkai1008/micro-kit/pkg/message"
+var (
+	DefaultMaxIdleConnections = 10
+	DefaultMaxOpenConnections = 100
 )
 
 // New returns a new gorm.DB instance with options.
-func New(o *Options, tables []interface{}) (*gorm.DB, error) {
-	db, err := gorm.Open(mysql.Open(o.DSN()), &gorm.Config{
+//
+// The default options are:
+//  - MaxIdleConnections: DefaultMaxIdleConnections
+//  - MaxOpenConnections: DefaultMaxOpenConnections
+//  - EnableAutoMigrate: true
+//
+func New(tables []interface{}, opts ...Option) (*gorm.DB, error) {
+	o := Options{
+		MaxIdleConnections: DefaultMaxIdleConnections,
+		MaxOpenConnections: DefaultMaxOpenConnections,
+		EnableAutoMigrate:  true,
+	}
+
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	db, err := gorm.Open(mysql.Open(o.Source), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, message.DatabaseConnectError)
+		return nil, err
 	}
 
-	if err = configure(db, o); err != nil {
-		return nil, errors.WithMessage(err, message.ORMConfigError)
+	if err = configure(db, &o); err != nil {
+		return nil, err
 	}
 
 	if o.EnableAutoMigrate {
 		if err = db.AutoMigrate(tables...); err != nil {
-			return nil, errors.Wrap(err, message.DatabaseMigrateError)
+			return nil, err
 		}
 	}
 
@@ -38,11 +55,9 @@ func New(o *Options, tables []interface{}) (*gorm.DB, error) {
 func configure(db *gorm.DB, o *Options) error {
 	sqlDB, err := db.DB()
 	if err != nil {
-		return errors.Wrap(err, message.GetConnectionError)
+		return err
 	}
 	sqlDB.SetMaxIdleConns(o.MaxIdleConnections)
 	sqlDB.SetMaxOpenConns(o.MaxOpenConnections)
 	return nil
 }
-
-var ProviderSet = wire.NewSet(New, NewOptions)

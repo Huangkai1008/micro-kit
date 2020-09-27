@@ -4,21 +4,36 @@ import (
 	"os"
 	"time"
 
-	"github.com/google/wire"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+)
 
-	"github.com/Huangkai1008/micro-kit/pkg/message"
+var (
+	DefaultLevel = 0
 )
 
 // New constructs a new logger from the provided Options.
-func New(o *Options) (*zap.Logger, error) {
+//
+// The default options are:
+//   - Level: DefaultLevel
+//   - Stdout: true
+//
+func New(fileName string, opts ...Option) (*zap.Logger, error) {
 	var (
 		err    error
 		logger *zap.Logger
 	)
+
+	o := Options{
+		FileName: fileName,
+		Level:    DefaultLevel,
+		Stdout:   true,
+	}
+
+	for _, opt := range opts {
+		opt(&o)
+	}
 
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
@@ -67,7 +82,7 @@ func New(o *Options) (*zap.Logger, error) {
 	if err == nil {
 		return logger, nil
 	} else {
-		return nil, errors.Wrap(err, message.LogConfigError)
+		return nil, err
 	}
 }
 
@@ -75,5 +90,3 @@ func New(o *Options) (*zap.Logger, error) {
 func jsonTimeEncoder(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
 	encoder.AppendString(t.Format("2006/01/05 15:04:05:000"))
 }
-
-var ProviderSet = wire.NewSet(New, NewOptions)

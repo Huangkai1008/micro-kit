@@ -1,29 +1,55 @@
 package consul
 
-import (
-	"github.com/pkg/errors"
-	"github.com/spf13/viper"
-
-	kitmsg "github.com/Huangkai1008/kit/pkg/message"
-)
+type Option func(*Options)
 
 type Options struct {
-	Addr                           string `mapstructure:"addr"`
-	EnableHealthCheck              bool   `mapstructure:"enable_health_check"`
-	HealthCheckInterval            int    `mapstructure:"health_check_interval"`
-	DeregisterCriticalServiceAfter int    `mapstructure:"deregister_critical_service_after"`
-	HeartBeat                      bool   `mapstructure:"heart_beat"`
+	// Addr is the address of the consul server.
+	Addr string
+
+	// EnableHealthCheck enables the health check.
+	EnableHealthCheck bool
+
+	// HealthCheckInterval is the interval of the health check.
+	HealthCheckInterval int
+
+	// DeregisterCriticalServiceAfter is the time to wait before deregister a critical service.
+	DeregisterCriticalServiceAfter int
+
+	// HeartBeat enables the heart beat.
+	HeartBeat bool
 }
 
-// NewOptions creates a new set of o for the consul client.
-func NewOptions(v *viper.Viper) (*Options, error) {
-	var (
-		err error
-		o   = new(Options)
-	)
-
-	if err = v.Sub("consul").Unmarshal(o); err != nil {
-		return nil, errors.Wrap(err, kitmsg.LoadConfigError)
+// WithAddr sets the address of the consul server.
+func WithAddr(addr string) Option {
+	return func(o *Options) {
+		o.Addr = addr
 	}
-	return o, err
+}
+
+// WithEnableHealthCheck enables the health check.
+func WithEnableHealthCheck(enable bool) Option {
+	return func(o *Options) {
+		o.EnableHealthCheck = enable
+	}
+}
+
+// WithHealthCheckInterval sets the interval of the health check.
+func WithHealthCheckInterval(interval int) Option {
+	return func(o *Options) {
+		o.HealthCheckInterval = interval
+	}
+}
+
+// WithDeregisterCriticalServiceAfter sets the time to wait before deregister a critical service.
+func WithDeregisterCriticalServiceAfter(deregisterCriticalServiceAfter int) Option {
+	return func(o *Options) {
+		o.DeregisterCriticalServiceAfter = deregisterCriticalServiceAfter
+	}
+}
+
+// WithHeartBeat enables the heart beat.
+func WithHeartBeat(enable bool) Option {
+	return func(o *Options) {
+		o.HeartBeat = enable
+	}
 }

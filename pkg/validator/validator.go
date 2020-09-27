@@ -5,7 +5,6 @@ import (
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/wire"
 
 	kiterr "github.com/Huangkai1008/micro-kit/pkg/error"
 )
@@ -16,15 +15,15 @@ type CustomValidator struct {
 	locale   string
 }
 
-func New(o *Options) (*CustomValidator, error) {
+func New(locale string) (*CustomValidator, error) {
 	validate := validator.New()
-	trans, err := registerTranslation(validate, o.Locale)
+	trans, err := registerTranslation(validate, locale)
 	if err != nil {
 		return nil, err
 	}
 	return &CustomValidator{
 		validate: validate,
-		locale:   o.Locale,
+		locale:   locale,
 		trans:    trans,
 	}, nil
 }
@@ -44,5 +43,3 @@ func (v *CustomValidator) Validate(i interface{}) error {
 	}
 	return nil
 }
-
-var ProviderSet = wire.NewSet(New, NewOptions)

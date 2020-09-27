@@ -1,25 +1,40 @@
 package minio
 
 import (
-	"github.com/google/wire"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/pkg/errors"
+)
 
-	"github.com/Huangkai1008/micro-kit/pkg/message"
+var (
+	DefaultEndpoint = "localhost:9000"
+	DefaultRegion   = "cn-north-1"
 )
 
 // New returns new minioClient instance with options.
-func New(o *Options) (*minio.Client, error) {
+//
+// The default options are:
+// 	- Endpoint: DefaultEndpoint
+// 	- UseSSL: false
+// 	- Region: DefaultRegion
+//
+func New(opts ...Option) (*minio.Client, error) {
+	o := Options{
+		Endpoint: DefaultEndpoint,
+		UseSSL:   false,
+		Region:   DefaultRegion,
+	}
+
+	for _, opt := range opts {
+		opt(&o)
+	}
+
 	minioClient, err := minio.New(o.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(o.AccessKeyID, o.SecretAccessKey, ""),
 		Secure: o.UseSSL,
 		Region: o.Region,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, message.MinioConfigError)
+		return nil, err
 	}
 	return minioClient, err
 }
-
-var ProviderSet = wire.NewSet(New, NewOptions)

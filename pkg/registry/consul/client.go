@@ -14,6 +14,13 @@ import (
 	"github.com/Huangkai1008/micro-kit/pkg/registry"
 )
 
+var (
+	DefaultAddr                           = "127.0.0.1:8500"
+	DefaultHealthCheckInterval            = 10
+	DefaultDeregisterCriticalServiceAfter = 60
+)
+
+// Client is a consul client.
 type Client struct {
 	cli    *api.Client
 	ctx    context.Context
@@ -23,7 +30,28 @@ type Client struct {
 	*Options
 }
 
-func NewClient(o *Options, logger *zap.Logger) (*Client, error) {
+// NewClient returns a new consul client.
+//
+// The default options are:
+// 	- Addr: DefaultAddr
+// 	- EnableHealthCheck: true
+// 	- HealthCheckInterval: DefaultHealthCheckInterval
+// 	- DeregisterCriticalServiceAfter: DefaultDeregisterCriticalServiceAfter
+// 	- HeartBeat: true
+//
+func NewClient(logger *zap.Logger, opts ...Option) (*Client, error) {
+	o := Options{
+		Addr:                           DefaultAddr,
+		EnableHealthCheck:              true,
+		HealthCheckInterval:            DefaultHealthCheckInterval,
+		DeregisterCriticalServiceAfter: DefaultDeregisterCriticalServiceAfter,
+		HeartBeat:                      true,
+	}
+
+	for _, opt := range opts {
+		opt(&o)
+	}
+
 	cli, err := api.NewClient(&api.Config{
 		Address: o.Addr,
 	})
@@ -34,7 +62,7 @@ func NewClient(o *Options, logger *zap.Logger) (*Client, error) {
 	c := &Client{
 		cli:     cli,
 		logger:  logger,
-		Options: o,
+		Options: &o,
 	}
 	c.ctx, c.cancel = context.WithCancel(context.Background())
 	return c, nil

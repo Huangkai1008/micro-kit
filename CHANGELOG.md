@@ -1,8 +1,14 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.7.0"></a>
+## [v0.7.0] - 2020-09-27
 ### Code Refactoring
 - options pattern
+
+### Features
+- **meta:** meta fields
 
 
 <a name="v0.6.0"></a>
@@ -43,7 +49,8 @@
 - init commit
 
 
-[Unreleased]: https://github.com/Huangkai1008/micro-kit/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/Huangkai1008/micro-kit/compare/v0.7.0...HEAD
+[v0.7.0]: https://github.com/Huangkai1008/micro-kit/compare/v0.6.0...v0.7.0
 [v0.6.0]: https://github.com/Huangkai1008/micro-kit/compare/v0.5.0...v0.6.0
 [v0.5.0]: https://github.com/Huangkai1008/micro-kit/compare/v0.4.0...v0.5.0
 [v0.4.0]: https://github.com/Huangkai1008/micro-kit/compare/v0.3.0...v0.4.0

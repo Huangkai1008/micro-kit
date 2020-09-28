@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 
 	kitmw "github.com/Huangkai1008/micro-kit/pkg/middleware"
-	"github.com/Huangkai1008/micro-kit/pkg/validator"
+	"github.com/Huangkai1008/micro-kit/pkg/transport/http/validator"
 )
 
 type Group func(*echo.Group)

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 
 	"go.uber.org/zap"
@@ -40,7 +41,7 @@ type Server struct {
 //  - WriteTimeout: DefaultWriteTimeout
 //  - Mode: DebugMode
 //
-func New(logger *zap.Logger, router http.Handler, registrar registry.Registrar, opts ...Option) *Server {
+func New(logger *zap.Logger, router *echo.Echo, registrar registry.Registrar, opts ...Option) *Server {
 	o := Options{
 		ReadTimeout:  DefaultReadTimeout,
 		WriteTimeout: DefaultWriteTimeout,

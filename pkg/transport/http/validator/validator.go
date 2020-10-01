@@ -6,7 +6,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 
-	kiterr "github.com/Huangkai1008/micro-kit/pkg/error"
+	e "github.com/Huangkai1008/micro-kit/pkg/error"
 )
 
 type CustomValidator struct {
@@ -39,7 +39,7 @@ func (v *CustomValidator) Validate(i interface{}) error {
 				builder.WriteString(", ")
 			}
 		}
-		return kiterr.NewValidationError(builder.String())
+		return e.NewValidationError(builder.String())
 	}
 	return nil
 }

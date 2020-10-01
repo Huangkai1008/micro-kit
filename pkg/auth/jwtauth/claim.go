@@ -31,7 +31,11 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+func (c *Claims) GetIdentity() interface{} {
+	return c.Identity
+}
+
 // HasExpired returns true if the token has expired.
 func (c *Claims) HasExpired() bool {
-	return c.VerifyExpiresAt(time.Now(), true)
+	return !c.VerifyExpiresAt(time.Now(), true)
 }

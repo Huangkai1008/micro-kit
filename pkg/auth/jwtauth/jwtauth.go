@@ -87,7 +87,7 @@ func (j *JwtAuth) ParseToken(tokenString string) (auth.Claims, error) {
 
 func (j *JwtAuth) ParseJwtToken(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return j.SecretKey, nil
+		return []byte(j.SecretKey), nil
 	})
 
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {

@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 
+<a name="v0.8.1"></a>
+## [v0.8.1] - 2020-10-01
+### Bug Fixes
+- **auth:** jwt middleware parse token expires
+
+
 <a name="v0.8.0"></a>
 ## [v0.8.0] - 2020-09-29
 ### Features
@@ -64,7 +70,8 @@
 - init commit
 
 
-[Unreleased]: https://github.com/Huangkai1008/micro-kit/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/Huangkai1008/micro-kit/compare/v0.8.1...HEAD
+[v0.8.1]: https://github.com/Huangkai1008/micro-kit/compare/v0.8.0...v0.8.1
 [v0.8.0]: https://github.com/Huangkai1008/micro-kit/compare/v0.7.1...v0.8.0
 [v0.7.1]: https://github.com/Huangkai1008/micro-kit/compare/v0.7.0...v0.7.1
 [v0.7.0]: https://github.com/Huangkai1008/micro-kit/compare/v0.6.0...v0.7.0
